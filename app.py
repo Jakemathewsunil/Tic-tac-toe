@@ -7,7 +7,7 @@ board = [["" for _ in range(3)] for _ in range(3)]
 current_player = "X"
 
 def check_winner():
-    # Check rows, columns and diagonals for a winner
+    # Check rows, columns, and diagonals for a winner
     for row in board:
         if row[0] == row[1] == row[2] != "":
             return row[0]
@@ -28,7 +28,7 @@ def index():
 def move():
     global current_player
     data = request.get_json()
-    row, col = data['row'], data['col']
+    row, col = int(data['row']), int(data['col'])  # Ensure row and col are integers
     if board[row][col] == "":
         board[row][col] = current_player
         winner = check_winner()
@@ -37,6 +37,13 @@ def move():
         current_player = "O" if current_player == "X" else "X"
         return jsonify({"board": board, "current_player": current_player})
     return jsonify({"error": "Cell already taken"}), 400
+
+@app.route('/reset', methods=['GET'])
+def reset():
+    global board, current_player
+    board = [["" for _ in range(3)] for _ in range(3)]
+    current_player = "X"
+    return jsonify({"status": "reset"})
 
 if __name__ == '__main__':
     app.run(debug=True)
