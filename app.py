@@ -28,12 +28,12 @@ def index():
 def move():
     global current_player
     data = request.get_json()
-    row, col = int(data['row']), int(data['col'])  # Ensure row and col are integers
+    row, col = int(data['row']), int(data['col'])
     if board[row][col] == "":
         board[row][col] = current_player
         winner = check_winner()
         if winner:
-            return jsonify({"winner": winner})
+            return jsonify({"board": board, "winner": winner})
         current_player = "O" if current_player == "X" else "X"
         return jsonify({"board": board, "current_player": current_player})
     return jsonify({"error": "Cell already taken"}), 400
