@@ -1,7 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cells = document.querySelectorAll('.cell');
     const gameBoard = document.getElementById('game-board');
-    const resetButton = document.querySelector('button');
+    const resetButton = document.getElementById('reset-button');
+    const clearButton = document.getElementById('clear-button');
+    const playerXWinsElement = document.getElementById('playerXWins');
+    const playerOWinsElement = document.getElementById('playerOWins');
+    let playerXWins = 0;
+    let playerOWins = 0;
 
     // Function to handle cell click
     const handleCellClick = async (e) => {
@@ -28,7 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (winner) {
                 setTimeout(() => {
                     alert(`Player ${winner} wins!`);
-                    resetGame();
+                    if (winner === 'X') {
+                        playerXWins += 1;
+                        playerXWinsElement.innerText = playerXWins;
+                    } else if (winner === 'O') {
+                        playerOWins += 1;
+                        playerOWinsElement.innerText = playerOWins;
+                    }
+                    clearGameBoard();
                 }, 100); // Small delay to show the last move
             }
         }
@@ -44,7 +56,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Function to reset the game
+    // Function to clear the game board
+const clearGameBoard = async () => {
+    const response = await fetch('/clear', {
+        method: 'GET'
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'cleared') {
+        cells.forEach(cell => {
+            cell.innerText = '';
+        });
+    }
+};
+
+    // Function to reset the game and the scoreboard
     const resetGame = async () => {
         const response = await fetch('/reset', {
             method: 'GET'
@@ -53,9 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
 
         if (data.status === 'reset') {
-            cells.forEach(cell => {
-                cell.innerText = '';
-            });
+            clearGameBoard();
+            playerXWins = 0;
+            playerOWins = 0;
+            playerXWinsElement.innerText = playerXWins;
+            playerOWinsElement.innerText = playerOWins;
         }
     };
 
@@ -64,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.addEventListener('click', handleCellClick);
     });
 
-    // Attach event listener to reset button
+    // Attach event listeners to buttons
+    clearButton.addEventListener('click', clearGameBoard);
     resetButton.addEventListener('click', resetGame);
 });

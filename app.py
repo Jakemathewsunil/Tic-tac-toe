@@ -45,5 +45,11 @@ def reset():
     current_player = "X"
     return jsonify({"status": "reset"})
 
+@app.route('/clear', methods=['GET'])
+def clear():
+    global board
+    board = [["" for _ in range(3)] for _ in range(3)]
+    return jsonify({"status": "cleared"})
+
 if __name__ == '__main__':
     app.run(debug=True)
